@@ -4,11 +4,14 @@ pub struct Solution {}
 impl Solution {
     pub fn can_jump(nums: Vec<i32>) -> bool {
         let mut max_i:i32 = 0;
-        for (idx, val) in nums.iter().enumerate() {
-            if idx as i32 > max_i {
+
+        for (i, val) in nums.iter().enumerate() {
+            let idx = i as i32;
+
+            if idx > max_i {
                 return false;
             }
-            max_i = std::cmp::max(*val + idx as i32, max_i);
+            max_i = std::cmp::max(*val + idx, max_i);
         }
         return true;
     }
