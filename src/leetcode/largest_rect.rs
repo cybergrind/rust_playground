@@ -21,40 +21,42 @@ impl Solution {
     }
 
     #[inline(always)]
-    pub fn step(mut acc: Vec<(usize, i32)>, idx: usize, value: i32, mut max_square: i32) ->
-        (i32, Vec<(usize, i32)>) {
+    pub fn step(
+        mut acc: Vec<(usize, i32)>,
+        idx: usize,
+        value: i32,
+        mut max_square: i32,
+    ) -> (i32, Vec<(usize, i32)>) {
         if acc.len() == 0 {
-                //println!("Push: idx={} value={}", idx, *value);
+            // println!("Push: idx={} value={}", idx, *value);
             acc.push((idx, value));
             return (max_square, acc);
+        }
+
+        let mut proc_idx = idx;
+        let mut proc_value = value;
+
+        while acc.last() != None {
+            let (proc_idx_c, proc_value_c) = acc[acc.len() - 1];
+            proc_value = proc_value_c;
+
+            if proc_value > value {
+                let (curr_max, new_acc) = Solution::get_square(acc, idx);
+                acc = new_acc;
+                max_square = cmp::max(curr_max, max_square);
+                //println!("max square: {} curr_max: {}", max_square, curr_max);
+
+                proc_idx = proc_idx_c;
+            } else {
+                break;
             }
-
-            let mut proc_idx = idx;
-            let mut proc_value = value;
-
-            while acc.last() != None {
-                let rr = acc.last().unwrap();
-                proc_value = rr.1;
-                let proc_idx_c = rr.0;
-
-                if proc_value > value {
-                    let r = Solution::get_square(acc, idx);
-                    acc = r.1;
-                    let curr_max = r.0;
-                    max_square = cmp::max(curr_max, max_square);
-                    //println!("max square: {} curr_max: {}", max_square, curr_max);
-
-                    proc_idx = proc_idx_c;
-                } else {
-                    break;
-                }
-            }
-            //println!("Push PREV: idx={} value={}", proc_idx, *value);
-            //println!("value={} proc_value={}", value, proc_value);
-            if value != proc_value {
-                acc.push((proc_idx, value));
-            }
-            return (max_square, acc);
+        }
+        //println!("Push PREV: idx={} value={}", proc_idx, *value);
+        //println!("value={} proc_value={}", value, proc_value);
+        if value != proc_value {
+            acc.push((proc_idx, value));
+        }
+        return (max_square, acc);
     }
 
     pub fn largest_rectangle_area(nums: Vec<i32>) -> i32 {
@@ -64,13 +66,11 @@ impl Solution {
 
         for (idx, value) in nums.iter().enumerate() {
             last_idx = idx;
-            let r = Solution::step(acc, idx, *value, max_square);
-            max_square = r.0;
-            acc = r.1;
+            let (_max_square, _acc) = Solution::step(acc, idx, *value, max_square);
+            max_square = _max_square;
+            acc = _acc;
         }
-        let r = Solution::step(acc, last_idx+1, 0, max_square);
-        max_square = r.0;
-        acc = r.1;
+        max_square = Solution::step(acc, last_idx + 1, 0, max_square).0;
         return max_square;
     }
 }
@@ -85,8 +85,17 @@ mod tests {
         assert_eq!(Solution::largest_rectangle_area(vec![1, 1, 1, 1, 1, 1]), 6);
         assert_eq!(Solution::largest_rectangle_area(vec![2, 4]), 4);
         assert_eq!(Solution::largest_rectangle_area(vec![2, 1, 2]), 3);
-        assert_eq!(Solution::largest_rectangle_area(vec![4, 3, 4, 3, 2, 1, 3]), 12);
-        assert_eq!(Solution::largest_rectangle_area(vec![8, 8, 8, 8, 8, 8, 8, 8]), 64);
-        assert_eq!(Solution::largest_rectangle_area(vec![8035; 67419]), 541711665);
+        assert_eq!(
+            Solution::largest_rectangle_area(vec![4, 3, 4, 3, 2, 1, 3]),
+            12
+        );
+        assert_eq!(
+            Solution::largest_rectangle_area(vec![8, 8, 8, 8, 8, 8, 8, 8]),
+            64
+        );
+        assert_eq!(
+            Solution::largest_rectangle_area(vec![8035; 67419]),
+            541711665
+        );
     }
 }
