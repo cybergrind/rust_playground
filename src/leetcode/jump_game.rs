@@ -3,7 +3,7 @@ pub struct Solution {}
 
 impl Solution {
     pub fn can_jump(nums: Vec<i32>) -> bool {
-        let mut max_i:i32 = 0;
+        let mut max_i: i32 = 0;
 
         for (i, val) in nums.iter().enumerate() {
             let idx = i as i32;
